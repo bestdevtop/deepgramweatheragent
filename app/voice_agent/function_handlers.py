@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from app.services.email import email_configured, send_coat_reminder_email
@@ -50,23 +51,29 @@ async def _check_weather(args: dict, caller_phone: str | None) -> dict:
         return result
 
     phone = _normalize_phone(caller_phone)
-    sms_sent = False
-    email_sent = False
 
-    if phone and twilio_configured():
+    async def try_sms() -> bool:
+        if not (phone and twilio_configured()):
+            if not phone:
+                logger.warning("Cold weather for %s but no caller phone available.", city)
+            return False
         try:
-            send_coat_reminder(weather, phone)
-            sms_sent = True
+            await asyncio.to_thread(send_coat_reminder, weather, phone)
+            return True
         except Exception:
             logger.exception("Failed to send Twilio SMS for city=%s", city)
-    elif not phone:
-        logger.warning("Cold weather for %s but no caller phone available.", city)
+            return False
 
-    if not sms_sent and email_configured():
+    async def try_email() -> bool:
+        if not email_configured():
+            return False
         try:
-            send_coat_reminder_email(weather)
-            email_sent = True
+            await asyncio.to_thread(send_coat_reminder_email, weather)
+            return True
         except Exception:
             logger.exception("Failed to send email coat reminder for city=%s", city)
+            return False
+
+    sms_sent, email_sent = await asyncio.gather(try_sms(), try_email())
 
     return build_weather_response(weather, sms_sent=sms_sent, email_sent=email_sent)

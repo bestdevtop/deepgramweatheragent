@@ -47,7 +47,12 @@ def build_weather_response(
     is_cold = temp < threshold
 
     if is_cold:
-        if sms_sent:
+        if sms_sent and email_sent:
+            message = (
+                f"It's {round(temp)}°F and {description} in {city_name}. "
+                "It's cold — I've texted and emailed you a coat reminder."
+            )
+        elif sms_sent:
             message = (
                 f"It's {round(temp)}°F and {description} in {city_name}. "
                 "It's cold — I've texted you a coat reminder."

@@ -52,7 +52,7 @@ def test_send_coat_reminder_email(mock_smtp, _mock_recipient, monkeypatch):
 @patch("app.voice_agent.function_handlers.twilio_configured", return_value=True)
 @patch("app.voice_agent.function_handlers.email_configured", return_value=True)
 @patch("app.voice_agent.function_handlers.fetch_weather")
-async def test_check_weather_falls_back_to_email_on_sms_failure(
+async def test_check_weather_sends_email_even_when_sms_fails(
     mock_fetch_weather,
     _mock_email_configured,
     _mock_twilio_configured,
@@ -71,3 +71,31 @@ async def test_check_weather_falls_back_to_email_on_sms_failure(
 
     mock_send_email.assert_called_once()
     assert "emailed you" in result["message"]
+
+
+@pytest.mark.asyncio
+@patch("app.voice_agent.function_handlers.send_coat_reminder_email")
+@patch("app.voice_agent.function_handlers.send_coat_reminder")
+@patch("app.voice_agent.function_handlers.twilio_configured", return_value=True)
+@patch("app.voice_agent.function_handlers.email_configured", return_value=True)
+@patch("app.voice_agent.function_handlers.fetch_weather")
+async def test_check_weather_sends_both_sms_and_email(
+    mock_fetch_weather,
+    _mock_email_configured,
+    _mock_twilio_configured,
+    mock_send_sms,
+    mock_send_email,
+):
+    from app.voice_agent.function_handlers import dispatch_function
+
+    mock_fetch_weather.return_value = {
+        "name": "London",
+        "main": {"temp": 39},
+        "weather": [{"description": "cloudy"}],
+    }
+
+    result = await dispatch_function("check_weather", {"city": "London"}, caller_phone="+15551234567")
+
+    mock_send_sms.assert_called_once()
+    mock_send_email.assert_called_once()
+    assert "texted and emailed you" in result["message"]

@@ -15,6 +15,17 @@ def test_build_weather_response_cold_with_sms():
     assert "coat reminder" in result["message"]
 
 
+def test_build_weather_response_cold_with_sms_and_email():
+    weather = {
+        "name": "Reykjavik",
+        "main": {"temp": 39},
+        "weather": [{"description": "snow"}],
+    }
+    result = build_weather_response(weather, threshold_f=50, sms_sent=True, email_sent=True)
+    assert result["is_cold"] is True
+    assert "texted and emailed you" in result["message"]
+
+
 def test_build_weather_response_warm():
     weather = {
         "name": "Dubai",

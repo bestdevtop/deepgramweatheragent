@@ -15,7 +15,7 @@ class ConfigResponse(BaseModel):
 
 
 class RecipientEmailUpdate(BaseModel):
-    recipient_email: EmailStr = Field(..., description="Email address for coat reminder fallback")
+    recipient_email: EmailStr = Field(..., description="Email address for coat reminders")
 
 
 class SendTestEmailRequest(BaseModel):
