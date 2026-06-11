@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     twilio_auth_token: str = ""
     twilio_from_number: str = ""
 
+    retell_twilio_number: str = "+13612641307"
+    retell_to_email: str = ""
+
     from_email: str = ""
     to_email: str = ""
     smtp_password: str = ""

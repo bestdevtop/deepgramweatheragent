@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import health
+from app.routers import config, health
 from app.telephony.routes import router as telephony_router
 
 logging.basicConfig(
@@ -27,6 +27,7 @@ app.add_middleware(
 )
 
 app.include_router(health.router, prefix="/api")
+app.include_router(config.router, prefix="/api")
 app.include_router(telephony_router)
 
 

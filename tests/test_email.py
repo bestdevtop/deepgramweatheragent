@@ -28,10 +28,10 @@ def test_build_weather_response_cold_with_email():
     assert "emailed you" in result["message"]
 
 
+@patch("app.services.email.get_recipient_email", return_value="hansonhv@outlook.com")
 @patch("app.services.email.smtplib.SMTP")
-def test_send_coat_reminder_email(mock_smtp, monkeypatch):
+def test_send_coat_reminder_email(mock_smtp, _mock_recipient, monkeypatch):
     monkeypatch.setattr("app.services.email.settings.from_email", "hansonhv@outlook.com")
-    monkeypatch.setattr("app.services.email.settings.to_email", "hansonhv@outlook.com")
     monkeypatch.setattr("app.services.email.settings.smtp_password", "secret")
 
     weather = {"name": "London", "main": {"temp": 45}}
