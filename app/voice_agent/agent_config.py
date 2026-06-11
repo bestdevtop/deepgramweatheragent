@@ -38,7 +38,7 @@ FUNCTION CALL RULES:
 When the conversation is naturally over, say goodbye and call end_call.
 """
 
-GREETING = "Hello! I can check today's weather for you. Which city would you like me to check?"
+GREETING = "...Hello! I can check today's weather for you. Which city would you like me to check?"
 
 FUNCTIONS = [
     ThinkSettingsV1FunctionsItem(
